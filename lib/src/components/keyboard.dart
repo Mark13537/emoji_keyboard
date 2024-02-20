@@ -58,9 +58,7 @@ class Keyboard extends ConsumerWidget {
                   );
                 }),
           ),
-          SearchBox(
-            emojiModel: emojiModel,
-          ),
+          const SearchBox(),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

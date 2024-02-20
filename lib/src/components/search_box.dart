@@ -1,11 +1,10 @@
-import 'package:emoji_keyboard/src/home_feature/models/emoji_model.dart';
+import 'package:emoji_keyboard/src/home_feature/emoji_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../utils/constants.dart';
 
 class SearchBox extends ConsumerWidget {
-  const SearchBox({super.key, required this.emojiModel});
-  final EmojiModel emojiModel;
+  const SearchBox({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,10 +37,10 @@ class SearchBox extends ConsumerWidget {
           ),
         ),
         onTap: () {
-          //emojiModel.isSearching();
+          ref.read(emojiProvider.notifier).searching();
         },
         onChanged: (text) {
-          // emojiModel.textInputChange(text);
+          ref.read(emojiProvider.notifier).textInputChanged(text);
         },
       ),
     );

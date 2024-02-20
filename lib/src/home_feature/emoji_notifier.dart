@@ -47,4 +47,20 @@ class EmojiNotifier extends AsyncNotifier<EmojiModel> {
     }
     state = AsyncData(state.value!.copyWith(selectedEmojis: buildEmojiList));
   }
+
+  void searching() {
+    state = AsyncData(state.value!.copyWith(searching: true));
+  }
+
+  void textInputChanged(String text) {
+    // Update searchEmojis list according to serch text
+
+    List<Emoji> buildSearchEmojis = state.value!.emojis
+        .where((emoji) =>
+            emoji.emojiDetail.discription.contains(text.toLowerCase()))
+        .toList();
+
+    state = AsyncData(state.value!
+        .copyWith(enteredText: text, searchEmojis: buildSearchEmojis));
+  }
 }
