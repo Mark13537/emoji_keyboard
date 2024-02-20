@@ -1,67 +1,42 @@
-import 'package:emoji_keyboard/src/home_feature/models/emoji_model.dart';
+import 'package:emoji_keyboard/src/components/keyboard.dart';
+import 'package:emoji_keyboard/src/home_feature/emoji_notifier.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeView extends StatefulWidget {
+class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
 
   @override
-  State<HomeView> createState() => _HomeViewState();
+  ConsumerState<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _HomeViewState extends ConsumerState<HomeView> {
   TextEditingController controller = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    EmojiModel.create(filePath: 'assets/all-emoji.json');
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final emojiNotifier = ref.watch(emojiProvider);
     return Scaffold(
-        appBar: AppBar(title: const Text('Emoji Keyboard')),
-        body: Column(
+      appBar: AppBar(title: const Text('Emoji Keyboard')),
+      body: emojiNotifier.when(
+        data: (data) => Column(
           children: [
-            TextField(
-              readOnly: true,
-              controller: controller,
+            Expanded(
+              flex: 2,
+              child: TextField(
+                readOnly: true,
+                controller: controller,
+              ),
             ),
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    controller.text = '${controller.text} Hello';
-                  },
-                  child: Container(
-                    height: 50,
-                    width: 50,
-                    color: Colors.red,
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    controller.text = '${controller.text} Hello2';
-                  },
-                  child: Container(
-                    height: 50,
-                    width: 50,
-                    color: Colors.amber,
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    controller.text = '${controller.text} Hello3';
-                  },
-                  child: Container(
-                    height: 50,
-                    width: 50,
-                    color: Colors.green,
-                  ),
-                ),
-              ],
+            Expanded(
+              flex: 8,
+              child: Keyboard(emojiModel: data),
             )
           ],
-        ));
+        ),
+        error: (error, stack) => Text('Error: $error'),
+        loading: () => const Center(child: CircularProgressIndicator()),
+      ),
+    );
   }
 }
