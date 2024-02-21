@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_dynamic_calls
+
 import 'dart:convert';
 
 import 'package:emoji_keyboard/src/home_feature/models/emoji_config.dart';

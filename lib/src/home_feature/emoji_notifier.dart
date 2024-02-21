@@ -17,11 +17,8 @@ class EmojiNotifier extends AsyncNotifier<EmojiModel> {
     var emojiInstance =
         await EmojiConfig.create(filePath: 'assets/all-emoji.json');
 
-    Utils.getRecentForSharedPrefs().then((value) {
-      usedEmojis = Utils.parseStringToObjList(value);
-      print(usedEmojis.toString());
-      print(usedEmojis.runtimeType);
-    });
+    var sharedPrefsEmojis = await Utils.getRecentForSharedPrefs();
+    usedEmojis = Utils.parseStringToObjList(sharedPrefsEmojis);
 
     return EmojiModel(
         searching: false,
@@ -29,7 +26,7 @@ class EmojiNotifier extends AsyncNotifier<EmojiModel> {
         selectedEmojis: [],
         searchEmojis: [],
         selectedTabIndex: 0,
-        usedEmojis: usedEmojis ?? [],
+        usedEmojis: usedEmojis,
         selectedCat: Constants.catRecent,
         enteredText: '');
   }
