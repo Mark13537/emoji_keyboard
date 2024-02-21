@@ -10,9 +10,9 @@ class EmojiConfig {
   Emoji emoji = Emoji(
       category: '',
       subcategory: '',
-      emojiDetail: EmojiDetail(id: '', code: '', emoji: '', discription: ''));
+      emojiDetail: EmojiDetail(id: '', code: '', emoji: '', description: ''));
   EmojiDetail emojiDetail =
-      EmojiDetail(id: '', code: '', emoji: '', discription: '');
+      EmojiDetail(id: '', code: '', emoji: '', description: '');
 
   EmojiConfig._create({required this.filePath});
 
@@ -49,7 +49,7 @@ class EmojiConfig {
         emojiDetail.setId(rawList[i][0]);
         emojiDetail.setCode(rawList[i][1]);
         emojiDetail.setEmoji(rawList[i][2]);
-        emojiDetail.setDiscription(rawList[i][3]);
+        emojiDetail.setDescription(rawList[i][3]);
         emoji.setEmojiDetail(emojiDetail);
         list.add(Emoji(
             category: emoji.category,
@@ -58,7 +58,7 @@ class EmojiConfig {
                 id: emojiDetail.id,
                 code: emojiDetail.code,
                 emoji: emojiDetail.emoji,
-                discription: emojiDetail.discription)));
+                description: emojiDetail.description)));
       }
     }
     return list;
@@ -74,12 +74,29 @@ class Emoji {
   String category = '';
   String subcategory = '';
   EmojiDetail emojiDetail =
-      EmojiDetail(id: '', code: '', emoji: '', discription: '');
+      EmojiDetail(id: '', code: '', emoji: '', description: '');
 
   Emoji(
       {required this.category,
       required this.subcategory,
       required this.emojiDetail});
+
+  Map<String, dynamic> toMap() {
+    return {
+      '"category"': '"$category"',
+      '"subcategory"': '"$subcategory"',
+      '"emojiDetail"': emojiDetail.toMap(),
+    };
+  }
+
+  Emoji.fromJson(Map<String, dynamic> json) {
+    category = json['category'] != null ? json['category'].toString() : '';
+    subcategory =
+        json['subcategory'] != null ? json['subcategory'].toString() : '';
+    emojiDetail = (json['emojiDetail'] != null && (json['emojiDetail'] is Map))
+        ? EmojiDetail.fromJson(json['emojiDetail'] as Map<String, dynamic>)
+        : EmojiDetail(id: '', code: '', emoji: '', description: '');
+  }
 
   void setCategory(String category) {
     this.category = category;
@@ -95,7 +112,39 @@ class Emoji {
 
   @override
   String toString() {
-    return 'Category: $category Subcategory: $subcategory EmojiDetail: $emojiDetail';
+    return toMap().toString();
+  }
+
+  static List<Emoji> parseEmojis(String input) {
+    final result = <Emoji>[];
+    final parts = input.split(',');
+    var currentEmoji = Emoji(
+        category: '',
+        subcategory: '',
+        emojiDetail: EmojiDetail(id: '', code: '', emoji: '', description: ''));
+    for (final part in parts) {
+      if (part.startsWith('Category:')) {
+        currentEmoji = Emoji(
+            category: '',
+            subcategory: '',
+            emojiDetail:
+                EmojiDetail(id: '', code: '', emoji: '', description: ''));
+        currentEmoji.category = part.split(': ')[1];
+      } else if (part.startsWith('Subcategory:')) {
+        currentEmoji.subcategory = part.split(': ')[1];
+      } else if (part.startsWith('EmojiDetail:')) {
+        final details = part.split(': ')[1];
+        final detailsParts = details.split(' ');
+        currentEmoji.emojiDetail = EmojiDetail(
+          id: detailsParts[0].split(': ')[1],
+          code: detailsParts[1].split(': ')[1],
+          emoji: detailsParts[2].split(': ')[1],
+          description: detailsParts[3].split(': ')[1],
+        );
+        result.add(currentEmoji);
+      }
+    }
+    return result;
   }
 }
 
@@ -103,13 +152,30 @@ class EmojiDetail {
   String id = '';
   String code = '';
   String emoji = '';
-  String discription = '';
+  String description = '';
 
   EmojiDetail(
       {required this.id,
       required this.code,
       required this.emoji,
-      required this.discription});
+      required this.description});
+
+  Map<String, String> toMap() {
+    return {
+      '"id"': '"$id"',
+      '"code"': '"$code"',
+      '"emoji"': '"$emoji"',
+      '"description"': '"$description"',
+    };
+  }
+
+  EmojiDetail.fromJson(Map<String, dynamic> json) {
+    id = json['id'] != null ? json['id'].toString() : '';
+    code = json['code'] != null ? json['code'].toString() : '';
+    emoji = json['emoji'] != null ? json['emoji'].toString() : '';
+    description =
+        json['description'] != null ? json['description'].toString() : '';
+  }
 
   void setId(String id) {
     this.id = id;
@@ -123,12 +189,12 @@ class EmojiDetail {
     this.emoji = emoji;
   }
 
-  void setDiscription(String discription) {
-    this.discription = discription;
+  void setDescription(String description) {
+    this.description = description;
   }
 
   @override
   String toString() {
-    return 'Id: $id Code: $code Emoji: $emoji Discription: $discription';
+    return toMap().toString();
   }
 }

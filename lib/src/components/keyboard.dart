@@ -91,7 +91,7 @@ class Keyboard extends ConsumerWidget {
                         const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 7),
                     itemBuilder: (BuildContext context, int index) {
-                      return buildEmoji(emojiModel, index);
+                      return buildEmoji(emojiModel, index, ref);
                     },
                   ),
                 ),
@@ -103,15 +103,14 @@ class Keyboard extends ConsumerWidget {
     );
   }
 
-  Widget buildEmoji(EmojiModel emojiModel, int index) {
+  Widget buildEmoji(EmojiModel emojiModel, int index, WidgetRef ref) {
     return SizedBox(
       height: 40,
       width: 40,
       child: Center(
         child: GestureDetector(
           onTap: () {
-            print('CLICKED');
-            // emojiModel.onClickEmoji(index);
+            ref.read(emojiProvider.notifier).onClickEmoji(index);
           },
           child: Text(
             emojiModel.selectedCat == Constants.catRecent

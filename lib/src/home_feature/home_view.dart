@@ -3,18 +3,11 @@ import 'package:emoji_keyboard/src/home_feature/emoji_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class HomeView extends ConsumerStatefulWidget {
+class HomeView extends ConsumerWidget {
   const HomeView({super.key});
 
   @override
-  ConsumerState<HomeView> createState() => _HomeViewState();
-}
-
-class _HomeViewState extends ConsumerState<HomeView> {
-  TextEditingController controller = TextEditingController();
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final emojiNotifier = ref.watch(emojiProvider);
     return Scaffold(
       appBar: AppBar(title: const Text('Emoji Keyboard')),
@@ -23,9 +16,8 @@ class _HomeViewState extends ConsumerState<HomeView> {
           children: [
             Expanded(
               flex: 2,
-              child: TextField(
-                readOnly: true,
-                controller: controller,
+              child: Container(
+                color: Colors.white,
               ),
             ),
             Expanded(

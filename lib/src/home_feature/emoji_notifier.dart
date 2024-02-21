@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:emoji_keyboard/src/home_feature/models/emoji_model.dart';
+import 'package:emoji_keyboard/utils/utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../utils/constants.dart';
@@ -10,16 +13,23 @@ final emojiProvider =
 class EmojiNotifier extends AsyncNotifier<EmojiModel> {
   @override
   Future<EmojiModel> build() async {
+    List<Emoji>? usedEmojis;
     var emojiInstance =
         await EmojiConfig.create(filePath: 'assets/all-emoji.json');
-    // emojis = emojiInstance.emojiList;
+
+    Utils.getRecentForSharedPrefs().then((value) {
+      usedEmojis = Utils.parseStringToObjList(value);
+      print(usedEmojis.toString());
+      print(usedEmojis.runtimeType);
+    });
+
     return EmojiModel(
         searching: false,
         emojis: emojiInstance.emojiList,
         selectedEmojis: [],
         searchEmojis: [],
         selectedTabIndex: 0,
-        usedEmojis: [],
+        usedEmojis: usedEmojis ?? [],
         selectedCat: Constants.catRecent,
         enteredText: '');
   }
@@ -57,10 +67,39 @@ class EmojiNotifier extends AsyncNotifier<EmojiModel> {
 
     List<Emoji> buildSearchEmojis = state.value!.emojis
         .where((emoji) =>
-            emoji.emojiDetail.discription.contains(text.toLowerCase()))
+            emoji.emojiDetail.description.contains(text.toLowerCase()))
         .toList();
 
     state = AsyncData(state.value!
         .copyWith(enteredText: text, searchEmojis: buildSearchEmojis));
+  }
+
+  void onClickEmoji(int index) {
+    List<Emoji> buildUsedEmoji = state.value!.usedEmojis;
+    if (!checkIsExists(index)) {
+      //check lenght is >=10 then remove last item
+      if (buildUsedEmoji.length >= 10) {
+        buildUsedEmoji.removeLast();
+      }
+      state.value!.searching
+          ? buildUsedEmoji.add(state.value!.searchEmojis[index])
+          : buildUsedEmoji.add(state.value!.selectedEmojis[index]);
+
+      state = AsyncData(state.value!.copyWith(usedEmojis: buildUsedEmoji));
+
+      Utils.saveRecentInSharedPrefs(jsonEncode(buildUsedEmoji.toString()));
+    }
+  }
+
+  bool checkIsExists(int index) {
+    String description = state.value!.searching
+        ? state.value!.searchEmojis[index].emojiDetail.description
+        : state.value!.selectedEmojis[index].emojiDetail.description;
+    for (Emoji emoji in state.value!.usedEmojis) {
+      if (emoji.emojiDetail.description == description) {
+        return true;
+      }
+    }
+    return false;
   }
 }
